@@ -18,8 +18,10 @@ ui <- navbarPage("Earthquakes from 1900 - 2013",
                           mainPanel(
                             DT::dataTableOutput("data")
                           )
-                          ),
-                 tabPanel("two")
+                 ),
+                 tabPanel("Downlaod report",
+                          downloadButton("downloadData", "Download")
+                          )
                  )
 
 
