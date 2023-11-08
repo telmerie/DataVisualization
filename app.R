@@ -13,15 +13,13 @@ data <- read.csv("Earthquakes.csv", header=TRUE, sep=",")
 
 
 #UI
-ui <- navbarPage("Earthquakes from 1900 - 2013",
-                 tabPanel("Dataset",
+ui <- navbarPage("Group 14: Earthquakes from 1900 - 2013",
+                 tabPanel("Data set",
                           mainPanel(
                             DT::dataTableOutput("data")
                           )
                  ),
-                 tabPanel("Downlaod report",
-                          downloadButton("downloadData", "Download")
-                          )
+                 tabPanel("Report", tags$iframe(style = "height:600px; width:100%; scrolling=yes", src = "Report.pdf"))
                  )
 
 
