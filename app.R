@@ -53,12 +53,14 @@ ui <- navbarPage("Group 14: Earthquakes from 1900 - 2013",
                           )
                  ),
                  tabPanel("Evolution of Earthquakes",
-                          titlePanel("ggPlot for magnitude"),
-                          plotOutput("ggPlot"),
-                          titlePanel("Histogram for magnitude"),
+                          titlePanel("Scatter plot for the mean of magnitudes"),
+                          plotOutput("scatterPlot"),
+                          titlePanel("Histogram for the mean of magnitudes"),
                           plotOutput("magnitude"),
                           titlePanel("Number of earthquakes each year"),
-                          plotOutput("numberOfEarthquakesEachYear")
+                          plotOutput("numberOfEarthquakesEachYear"),
+                          titlePanel("Time series plot over the mean of magnitudes"),
+                          plotOutput("timeSeriesPlot")
                           ),
                  tabPanel("Report", tags$iframe(style = "height:600px; width:100%; scrolling=yes", src = "Report.pdf")),
                  )
@@ -71,7 +73,7 @@ server <- function(input, output){
   output$data = DT::renderDataTable({data})
   
   #Create "ggPlot"
-  output$ggPlot <- renderPlot({
+  output$scatterPlot <- renderPlot({
     ggplot(data = evolutionOfEarthquakes, aes(x = Year, y = Mean)) + geom_point() +
     theme(panel.background = element_rect(fill = "white"), 
           panel.grid.major = element_line(color = "grey")) 
@@ -84,7 +86,6 @@ server <- function(input, output){
             names.arg = meanOfEarthquakes$Year,  
             xlab = "Year",        
             ylab = "Mean",        
-            main = "Mean of magnitudes of earthquakes each year",  
             col = ifelse(meanOfEarthquakes$Mean > 6.5, "#DC267F", "#FFB000"),
             width = 0.01)
     # Add legend (description of colors)
@@ -97,10 +98,19 @@ server <- function(input, output){
             names.arg = numberOfEarthquakes$Year,  
             xlab = "Year",        
             ylab = "Number of earthquakes",   
-            main = "Number of earthquakes each year", 
             col = "#FFB000"
     )
   })
+  
+  output$timeSeriesPlot <- renderPlot({
+  ggplot(data = evolutionOfEarthquakes, aes(x = Year, y = Mean)) +
+    geom_line() +
+    labs(
+         x = "Year",
+         y = "Mean Value") +
+      scale_x_continuous(breaks = seq(min(evolutionOfEarthquakes$Year), max(evolutionOfEarthquakes$Year), by = 6))
+  })
+  
 }
   
 #Create app
