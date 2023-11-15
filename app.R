@@ -27,11 +27,17 @@ evolutionOfEarthquakes <- data %>% mutate(
 #Calculate the mean of each year
 evolutionOfEarthquakes <- evolutionOfEarthquakes %>% 
   group_by(Year) %>% 
-  mutate(Mean = mean(mag))
+  mutate(Mean = mean(mag),
+         MeanDepth = mean(depth))
 
 #Create a new table called "meanOfEarthquakes" where the mean for each year is shown
 meanOfEarthquakes <- evolutionOfEarthquakes %>%
   group_by(Year, Mean) %>%
+  summarise()
+
+#Create a new table called "meanOfDepths" where the mean for each year is shown
+meanOfDepths <- evolutionOfEarthquakes %>%
+  group_by(Year, MeanDepth) %>%
   summarise()
 
 #Create a new column in the data set "evolutionOfEarthquakes". The new column contains the number of earthquakes each year
@@ -58,7 +64,9 @@ ui <- navbarPage("Group 14: Earthquakes from 1900 - 2013",
                           titlePanel("Histogram for magnitude"),
                           plotOutput("magnitude"),
                           titlePanel("Number of earthquakes each year"),
-                          plotOutput("numberOfEarthquakesEachYear")
+                          plotOutput("numberOfEarthquakesEachYear"),
+                          titlePanel("depth of earthquake"),
+                          plotOutput("depth")
                           ),
                  tabPanel("Report", tags$iframe(style = "height:600px; width:100%; scrolling=yes", src = "Report.pdf")),
                  )
@@ -89,6 +97,17 @@ server <- function(input, output){
             width = 0.01)
     # Add legend (description of colors)
     legend("right", legend = c("Mean over 6.5", "Mean under 6.5"), fill = c("#DC267F", "#FFB000"))
+  })
+  
+  #Create "Bar plot for depth"
+  output$depth <- renderPlot({
+    barplot(meanOfDepths$MeanDepth, 
+            names.arg = meanOfDepths$Year,  
+            xlab = "Year",        
+            ylab = "Mean",        
+            main = "Mean of depths of earthquakes each year",  
+            col = "#DC267F",
+            width = 0.01)
   })
   
   #Create histogram for "Number of earthquakes each year" 
