@@ -66,12 +66,13 @@ ui <- navbarPage("Group 14: Earthquakes from 1900 - 2013",
                           titlePanel("Number of earthquakes each year"),
                           plotOutput("numberOfEarthquakesEachYear"),
                           titlePanel("depth of earthquake"),
-                          plotOutput("depth")
+                          plotOutput("depth"),
+                          titlePanel("Scatterplot: Depth vs. Magnitude"),
+                          plotOutput("scatterplotDepthMagnitude")
+                 
                           ),
                  tabPanel("Report", tags$iframe(style = "height:600px; width:100%; scrolling=yes", src = "Report.pdf")),
                  )
-                 
-
 
 #Server
 server <- function(input, output){
@@ -119,6 +120,13 @@ server <- function(input, output){
             main = "Number of earthquakes each year", 
             col = "#FFB000"
     )
+  })
+  output$scatterplotDepthMagnitude <- renderPlot({
+    ggplot(data = evolutionOfEarthquakes, aes(x = Mean, y = MeanDepth)) +
+      geom_point() +
+      labs(x = "Mean Magnitude", y = "Mean Depth", title = "Scatterplot: Depth vs. Magnitude") +
+      theme(panel.background = element_rect(fill = "white"), 
+            panel.grid.major = element_line(color = "grey")) 
   })
 }
   
