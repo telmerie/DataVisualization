@@ -53,14 +53,14 @@ ui <- navbarPage("Group 14: Earthquakes from 1900 - 2013",
                           )
                  ),
                  tabPanel("Evolution of Earthquakes",
-                          titlePanel("Scatter plot for the mean of magnitudes"),
-                          plotOutput("scatterPlot"),
-                          titlePanel("Histogram for the mean of magnitudes"),
-                          plotOutput("magnitude"),
                           titlePanel("Number of earthquakes each year"),
                           plotOutput("numberOfEarthquakesEachYear"),
+                          titlePanel("Scatter plot for the mean of magnitudes"),
+                          plotOutput("scatterPlot"),
                           titlePanel("Time series plot over the mean of magnitudes"),
-                          plotOutput("timeSeriesPlot")
+                          plotOutput("timeSeriesPlot"),
+                          titlePanel("Histogram for the mean of magnitudes"),
+                          plotOutput("magnitude")
                           ),
                  tabPanel("Report", tags$iframe(style = "height:600px; width:100%; scrolling=yes", src = "Report.pdf")),
                  )
