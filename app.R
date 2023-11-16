@@ -7,7 +7,6 @@ library(shiny)
 library(DT)
 library(ggplot2)
 library(tidyverse)
-#library(dplyr)
 
 #import data set
 path <- dirname(rstudioapi::getSourceEditorContext()$path)
@@ -16,7 +15,10 @@ data <- read.csv("Earthquakes.csv", header=TRUE, sep=",")
 
 #remove all rows where the year is 2014
 data <- subset(data, as.numeric(format(as.Date(Date), "%Y")) != 2014)
-
+#set row counter to 0 after rows from 2014 were removed
+rownames(data) <- NULL
+#remove unused column "X"
+data <- data[, !(names(data) == "X")]
 
 #Edit tables for "Evolution of earthquakes"
 #Create a new column called "Year" where the date is only a year
@@ -48,6 +50,7 @@ numberOfEarthquakes <- evolutionOfEarthquakes %>%
 #UI
 ui <- navbarPage("Group 14: Earthquakes from 1900 - 2013",
                  tabPanel("Data set",
+                          titlePanel("Data set"),
                           mainPanel(
                             DT::dataTableOutput("data")
                           )
@@ -72,7 +75,7 @@ server <- function(input, output){
   
   output$data = DT::renderDataTable({data})
   
-  #Create "ggPlot"
+  #create "ggPlot"
   output$scatterPlot <- renderPlot({
     ggplot(data = evolutionOfEarthquakes, aes(x = Year, y = Mean)) + geom_point() +
     theme(panel.background = element_rect(fill = "white"), 
@@ -80,7 +83,7 @@ server <- function(input, output){
       
   })
   
-  #Create "Histogram for magnitude"
+  #create "Histogram for magnitude"
   output$magnitude <- renderPlot({
     barplot(meanOfEarthquakes$Mean, 
             names.arg = meanOfEarthquakes$Year,  
@@ -88,11 +91,11 @@ server <- function(input, output){
             ylab = "Mean",        
             col = ifelse(meanOfEarthquakes$Mean > 6.5, "#DC267F", "#FFB000"),
             width = 0.01)
-    # Add legend (description of colors)
+    #add legend (description of colors)
     legend("right", legend = c("Mean over 6.5", "Mean under 6.5"), fill = c("#DC267F", "#FFB000"))
   })
   
-  #Create histogram for "Number of earthquakes each year" 
+  #create histogram for "Number of earthquakes each year" 
   output$numberOfEarthquakesEachYear <- renderPlot({
     barplot(numberOfEarthquakes$Count, 
             names.arg = numberOfEarthquakes$Year,  
@@ -102,6 +105,7 @@ server <- function(input, output){
     )
   })
   
+  #create time series plot over "Mean of magnitudes"
   output$timeSeriesPlot <- renderPlot({
   ggplot(data = evolutionOfEarthquakes, aes(x = Year, y = Mean)) +
     geom_line() +
