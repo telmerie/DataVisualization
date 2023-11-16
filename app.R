@@ -73,7 +73,11 @@ ui <- navbarPage("Group 14: Earthquakes from 1900 - 2013",
 #Server
 server <- function(input, output){
   
-  output$data = DT::renderDataTable({data})
+  output$data <- DT::renderDataTable({
+    datatable(data, options = list(pageLength = 10)) %>%
+      formatStyle('Date', whiteSpace = 'nowrap') %>%
+      formatStyle('updated', whiteSpace = 'nowrap')
+  })
   
   #create "ggPlot"
   output$scatterPlot <- renderPlot({
