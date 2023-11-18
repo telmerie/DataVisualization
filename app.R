@@ -1,6 +1,8 @@
 #install packages
 install.packages("shiny")
 install.packages("DT")
+install.packages("ggplot2")
+install.packages("tidyverse")
 
 #import libraries
 library(shiny)
