@@ -65,12 +65,13 @@ ui <- navbarPage("Group 14: Earthquakes from 1900 - 2013",
                           plotOutput("magnitude"),
                           titlePanel("Number of earthquakes each year"),
                           plotOutput("numberOfEarthquakesEachYear"),
+                 ),
+                 tabPanel("Consistency between earthquakes",
                           titlePanel("depth of earthquake"),
                           plotOutput("depth"),
                           titlePanel("Scatterplot: Depth vs. Magnitude"),
-                          plotOutput("scatterplotDepthMagnitude")
-                 
-                          ),
+                          plotOutput("scatterplotDepthMagnitude"),
+                  ),
                  tabPanel("Report", tags$iframe(style = "height:600px; width:100%; scrolling=yes", src = "Report.pdf")),
                  )
 
