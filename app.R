@@ -3,12 +3,20 @@ install.packages("shiny")
 install.packages("DT")
 install.packages("ggplot2")
 install.packages("tidyverse")
+install.packages("sf")
+install.packages("mapview")
+install.packages("leaflet")
 
 #import libraries
 library(shiny)
 library(DT)
-library(ggplot2)
 library(tidyverse)
+library(sf)
+library(ggplot2)
+library(mapview)
+library(leaflet)
+
+
 
 #import data set
 path <- dirname(rstudioapi::getSourceEditorContext()$path)
@@ -49,6 +57,12 @@ numberOfEarthquakes <- evolutionOfEarthquakes %>%
   summarise()
 
 
+#world_map <-  mapview(data, xcol = "longitude", ycol = "latitude",crs = 4269, grid = FALSE)
+
+
+
+
+
 #UI
 ui <- navbarPage("Group 14: Earthquakes from 1900 - 2013",
                  tabPanel("Data set",
@@ -67,7 +81,24 @@ ui <- navbarPage("Group 14: Earthquakes from 1900 - 2013",
                           titlePanel("Histogram over the mean of magnitudes"),
                           plotOutput("magnitude")
                           ),
+
+                 tabPanel("World Map",
+                          sliderInput("years",
+                                      "Year:",
+                                      min = 1990, 
+                                      max = 2014,
+                                      value = 2000,
+                                      step = 1,
+                                      animate = TRUE
+                                      ),
+                        
+                          fluidRow(
+                            leafletOutput("mapplot","100%"),
+                          )
+                          )
+
                  tabPanel("Report", tags$iframe(style = "height:600px; width:100%; scrolling=yes", src = "Report.pdf")),
+
                  )
                  
 
@@ -75,6 +106,8 @@ ui <- navbarPage("Group 14: Earthquakes from 1900 - 2013",
 #Server
 server <- function(input, output){
   
+
+
   output$data <- DT::renderDataTable({
     datatable(data, options = list(pageLength = 10)) %>%
       formatStyle('Date', whiteSpace = 'nowrap') %>%
@@ -120,7 +153,20 @@ server <- function(input, output){
          y = "Mean Value") +
       scale_x_continuous(breaks = seq(min(evolutionOfEarthquakes$Year), max(evolutionOfEarthquakes$Year), by = 6))
   })
+
   
+  output$mapplot <- renderLeaflet({
+    years <-  input$years 
+    
+    quakeYear <- dplyr::filter(data, grepl(years , Date))
+    
+   
+    m <- mapview(quakeYear, xcol = "longitude", ycol = "latitude",crs = 4269, grid = FALSE)
+    m@map
+  })
+  
+  
+
 }
   
 #Create app
