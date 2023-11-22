@@ -86,7 +86,7 @@ ui <- navbarPage("Group 14: Earthquakes from 1900 - 2013",
                           sliderInput("years",
                                       "Year:",
                                       min = 1990, 
-                                      max = 2014,
+                                      max = 2013,
                                       value = 2000,
                                       step = 1,
                                       animate = TRUE
@@ -94,12 +94,11 @@ ui <- navbarPage("Group 14: Earthquakes from 1900 - 2013",
                         
                           fluidRow(
                             leafletOutput("mapplot","100%"),
-                          )
-                          )
-
+                          ),
+                 ),
                  tabPanel("Report", tags$iframe(style = "height:600px; width:100%; scrolling=yes", src = "Report.pdf")),
-
-                 )
+                 
+            )
                  
 
 
