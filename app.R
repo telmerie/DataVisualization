@@ -237,7 +237,6 @@ server <- function(input, output){
     m@map
   })
   
-  #LAV DENNE OM" 
   output$season <- renderPlot({
     # Set the color
     bar_color <- "#FFB000"
