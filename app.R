@@ -8,8 +8,6 @@ install.packages("mapview")
 install.packages("leaflet")
 install.packages("lubridate")
 
-
-
 #import libraries
 library(shiny)
 library(DT)
@@ -19,10 +17,6 @@ library(ggplot2)
 library(mapview)
 library(leaflet)
 library(lubridate)
-
-
-
-
 
 
 #import data set
@@ -64,50 +58,28 @@ evolutionOfEarthquakes <- evolutionOfEarthquakes %>%
   group_by(Year) %>%
   mutate(Count = n())
 
-#Creates new table called "numberOfEarthquakes" where the number of earthquakes each year is shown 
+#Create new table called "numberOfEarthquakes" where the number of earthquakes each year is shown 
 numberOfEarthquakes <- evolutionOfEarthquakes %>%
   group_by(Year, Count) %>%
   summarise()
 
+#Create a new table called "seasonOfEarthquakes" and copy existing columns from data
+seasonOfEarthquakes <- data
 
-#world_map <-  mapview(data, xcol = "longitude", ycol = "latitude",crs = 4269, grid = FALSE)
+#Add a new column called "month" to seasonOfEarthquakes
+seasonOfEarthquakes$Month <- month(data$Date)
 
+#Add a new column called "season" to seasonOfEarthquakes
+seasonOfEarthquakes$season <- ifelse(seasonOfEarthquakes$Month %in% c(12, 1, 2), "Winter",
+                                     ifelse(seasonOfEarthquakes$Month %in% c(3, 4, 5), "Spring",
+                                            ifelse(seasonOfEarthquakes$Month %in% c(6, 7, 8), "Summer",
+                                                   ifelse(seasonOfEarthquakes$Month %in% c(9, 10, 11), "Autumn", NA))))
 
+#Count occurrences of each season in seasonOfEarthquakes
+season_counts <- table(seasonOfEarthquakes$season)
 
-# Assuming your date column is in character format, convert it to Date format
-data$Date <- as.Date(data$Date)
-
-# Create a new column called "month"
-data$Month <- month(data$Date)
-
-# Create a new column called "season"
-data$season <- ifelse(data$Month %in% c(12, 1, 2), "Winter",
-                      ifelse(data$Month %in% c(3, 4, 5), "Spring",
-                             ifelse(data$Month %in% c(6, 7, 8), "Summer",
-                                    ifelse(data$Month %in% c(9, 10, 11), "Autumn", NA))))
-
-season_counts <- table(data$season)
-
-# Create a new dataframe with the season counts
+#Create a new dataframe with the season counts
 season_counts_df <- data.frame(Season = names(season_counts), Count = as.numeric(season_counts))
-
-# Display the season counts dataframe
-print(season_counts_df)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 #UI
@@ -128,6 +100,20 @@ ui <- navbarPage("Group 14: Earthquakes from 1900 - 2013",
                           titlePanel("Histogram over the mean of magnitudes"),
                           plotOutput("magnitude")
                  ),
+                 tabPanel("World Map",
+                          sliderInput("years",
+                                      "Year:",
+                                      min = 1990, 
+                                      max = 2014,
+                                      value = 2000,
+                                      step = 1,
+                                      animate = TRUE
+                          ),
+                          
+                          fluidRow(
+                            leafletOutput("mapplot","100%"),
+                          )
+                 ),
                  tabPanel("Consistency between Earthquakes",
                           titlePanel("Depth of earthquake"),
                           plotOutput("depth"),
@@ -137,20 +123,6 @@ ui <- navbarPage("Group 14: Earthquakes from 1900 - 2013",
                  tabPanel("Season of Earthquakes",
                           titlePanel("Number of earthquakes each season"),
                           plotOutput("season")),
-                 tabPanel("World Map",
-                          sliderInput("years",
-                                      "Year:",
-                                      min = 1990, 
-                                      max = 2014,
-                                      value = 2000,
-                                      step = 1,
-                                      animate = TRUE
-                                      ),
-                        
-                          fluidRow(
-                            leafletOutput("mapplot","100%"),
-                          )
-                  ),
                  tabPanel("Report", tags$iframe(style = "height:600px; width:100%; scrolling=yes", src = "Report.pdf")),
 
                  )
