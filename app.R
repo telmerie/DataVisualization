@@ -7,6 +7,8 @@ install.packages("sf")
 install.packages("mapview")
 install.packages("leaflet")
 
+
+
 #import libraries
 library(shiny)
 library(DT)
@@ -15,6 +17,9 @@ library(sf)
 library(ggplot2)
 library(mapview)
 library(leaflet)
+
+
+
 
 
 
@@ -69,6 +74,47 @@ numberOfEarthquakes <- evolutionOfEarthquakes %>%
 
 
 
+
+
+install.packages("lubridate")
+library(lubridate)
+
+# Assuming your date column is in character format, convert it to Date format
+data$Date <- as.Date(data$Date)
+
+# Create a new column called "month"
+data$Month <- month(data$Date)
+
+# Create a new column called "season"
+data$season <- ifelse(data$Month %in% c(12, 1, 2), "Winter",
+                      ifelse(data$Month %in% c(3, 4, 5), "Spring",
+                             ifelse(data$Month %in% c(6, 7, 8), "Summer",
+                                    ifelse(data$Month %in% c(9, 10, 11), "Autumn", NA))))
+
+season_counts <- table(data$season)
+
+# Create a new dataframe with the season counts
+season_counts_df <- data.frame(Season = names(season_counts), Count = as.numeric(season_counts))
+
+# Display the season counts dataframe
+print(season_counts_df)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #UI
 ui <- navbarPage("Group 14: Earthquakes from 1900 - 2013",
                  tabPanel("Data set",
@@ -107,6 +153,9 @@ ui <- navbarPage("Group 14: Earthquakes from 1900 - 2013",
                             leafletOutput("mapplot","100%"),
                           )
                   ),
+                 tabPanel("Season",
+                          titlePanel("Season something"),
+                          plotOutput("season")),
                  tabPanel("Report", tags$iframe(style = "height:600px; width:100%; scrolling=yes", src = "Report.pdf")),
 
                  )
@@ -186,6 +235,16 @@ server <- function(input, output){
    
     m <- mapview(quakeYear, xcol = "longitude", ycol = "latitude",crs = 4269, grid = FALSE)
     m@map
+  })
+  
+  #LAV DENNE OM" 
+  output$season <- renderPlot({
+    barplot(season_counts_df$Count, 
+            names.arg = season_counts_df$Season, 
+            col = "skyblue", 
+            main = "Season Counts", 
+            xlab = "Season", 
+            ylab = "Count")
   })
 }
   
