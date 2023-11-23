@@ -139,6 +139,9 @@ ui <- navbarPage("Group 14: Earthquakes from 1900 - 2013",
                           titlePanel("Scatterplot: Depth vs. Magnitude"),
                           plotOutput("scatterplotDepthMagnitude")
                  ),
+                 tabPanel("Season of Earthquakes",
+                          titlePanel("Number of earthquakes each season"),
+                          plotOutput("season")),
                  tabPanel("World Map",
                           sliderInput("years",
                                       "Year:",
@@ -153,9 +156,6 @@ ui <- navbarPage("Group 14: Earthquakes from 1900 - 2013",
                             leafletOutput("mapplot","100%"),
                           )
                   ),
-                 tabPanel("Season",
-                          titlePanel("Season something"),
-                          plotOutput("season")),
                  tabPanel("Report", tags$iframe(style = "height:600px; width:100%; scrolling=yes", src = "Report.pdf")),
 
                  )
@@ -239,12 +239,27 @@ server <- function(input, output){
   
   #LAV DENNE OM" 
   output$season <- renderPlot({
+    # Set the color
+    bar_color <- "#FFB000"
+    
+    # Create a bar plot with the specified color
     barplot(season_counts_df$Count, 
             names.arg = season_counts_df$Season, 
-            col = "skyblue", 
-            main = "Season Counts", 
+            col = bar_color, 
             xlab = "Season", 
-            ylab = "Count")
+            ylab = "Number of earthquakes")
+    
+    # Define custom labels
+    custom_labels <- c("December \nJanuary \nFebruary", 
+                       "March \nApril \nMay", 
+                       "June \nJuly \nAugust", 
+                       "September \nOctober \nNovember")
+    
+    # Add custom labels inside each bar with the same color
+    text(x = barplot(season_counts_df$Count, col = bar_color, add = TRUE), 
+         y = season_counts_df$Count - 0.1 * max(season_counts_df$Count), 
+         label = custom_labels,
+         pos = 1, cex = 0.8, col = "black", font = 2)
   })
 }
   
