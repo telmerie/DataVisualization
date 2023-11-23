@@ -7,6 +7,8 @@ install.packages("sf")
 install.packages("mapview")
 install.packages("leaflet")
 
+
+
 #import libraries
 library(shiny)
 library(DT)
@@ -15,6 +17,9 @@ library(sf)
 library(ggplot2)
 library(mapview)
 library(leaflet)
+
+
+
 
 
 
@@ -69,6 +74,47 @@ numberOfEarthquakes <- evolutionOfEarthquakes %>%
 
 
 
+
+
+install.packages("lubridate")
+library(lubridate)
+
+# Assuming your date column is in character format, convert it to Date format
+data$Date <- as.Date(data$Date)
+
+# Create a new column called "month"
+data$Month <- month(data$Date)
+
+# Create a new column called "season"
+data$season <- ifelse(data$Month %in% c(12, 1, 2), "Winter",
+                      ifelse(data$Month %in% c(3, 4, 5), "Spring",
+                             ifelse(data$Month %in% c(6, 7, 8), "Summer",
+                                    ifelse(data$Month %in% c(9, 10, 11), "Autumn", NA))))
+
+season_counts <- table(data$season)
+
+# Create a new dataframe with the season counts
+season_counts_df <- data.frame(Season = names(season_counts), Count = as.numeric(season_counts))
+
+# Display the season counts dataframe
+print(season_counts_df)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #UI
 ui <- navbarPage("Group 14: Earthquakes from 1900 - 2013",
                  tabPanel("Data set",
@@ -93,6 +139,9 @@ ui <- navbarPage("Group 14: Earthquakes from 1900 - 2013",
                           titlePanel("Scatterplot: Depth vs. Magnitude"),
                           plotOutput("scatterplotDepthMagnitude")
                  ),
+                 tabPanel("Season of Earthquakes",
+                          titlePanel("Number of earthquakes each season"),
+                          plotOutput("season")),
                  tabPanel("World Map",
                           sliderInput("years",
                                       "Year:",
@@ -186,6 +235,30 @@ server <- function(input, output){
    
     m <- mapview(quakeYear, xcol = "longitude", ycol = "latitude",crs = 4269, grid = FALSE)
     m@map
+  })
+  
+  output$season <- renderPlot({
+    # Set the color
+    bar_color <- "#FFB000"
+    
+    # Create a bar plot with the specified color
+    barplot(season_counts_df$Count, 
+            names.arg = season_counts_df$Season, 
+            col = bar_color, 
+            xlab = "Season", 
+            ylab = "Number of earthquakes")
+    
+    # Define custom labels
+    custom_labels <- c("December \nJanuary \nFebruary", 
+                       "March \nApril \nMay", 
+                       "June \nJuly \nAugust", 
+                       "September \nOctober \nNovember")
+    
+    # Add custom labels inside each bar with the same color
+    text(x = barplot(season_counts_df$Count, col = bar_color, add = TRUE), 
+         y = season_counts_df$Count - 0.1 * max(season_counts_df$Count), 
+         label = custom_labels,
+         pos = 1, cex = 0.8, col = "black", font = 2)
   })
 }
   
