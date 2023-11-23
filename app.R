@@ -6,6 +6,7 @@ install.packages("tidyverse")
 install.packages("sf")
 install.packages("mapview")
 install.packages("leaflet")
+install.packages("lubridate")
 
 
 
@@ -17,6 +18,7 @@ library(sf)
 library(ggplot2)
 library(mapview)
 library(leaflet)
+library(lubridate)
 
 
 
@@ -71,13 +73,6 @@ numberOfEarthquakes <- evolutionOfEarthquakes %>%
 #world_map <-  mapview(data, xcol = "longitude", ycol = "latitude",crs = 4269, grid = FALSE)
 
 
-
-
-
-
-
-install.packages("lubridate")
-library(lubridate)
 
 # Assuming your date column is in character format, convert it to Date format
 data$Date <- as.Date(data$Date)
