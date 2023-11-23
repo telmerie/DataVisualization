@@ -39,11 +39,17 @@ evolutionOfEarthquakes <- data %>% mutate(
 #Calculate the mean of each year
 evolutionOfEarthquakes <- evolutionOfEarthquakes %>% 
   group_by(Year) %>% 
-  mutate(Mean = mean(mag))
+  mutate(Mean = mean(mag),
+         MeanDepth = mean(depth))
 
 #Create a new table called "meanOfEarthquakes" where the mean for each year is shown
 meanOfEarthquakes <- evolutionOfEarthquakes %>%
   group_by(Year, Mean) %>%
+  summarise()
+
+#Create a new table called "meanOfDepths" where the mean for each year is shown
+meanOfDepths <- evolutionOfEarthquakes %>%
+  group_by(Year, MeanDepth) %>%
   summarise()
 
 #Create a new column in the data set "evolutionOfEarthquakes". The new column contains the number of earthquakes each year
@@ -80,8 +86,13 @@ ui <- navbarPage("Group 14: Earthquakes from 1900 - 2013",
                           plotOutput("timeSeriesPlot"),
                           titlePanel("Histogram over the mean of magnitudes"),
                           plotOutput("magnitude")
-                          ),
-
+                 ),
+                 tabPanel("Consistency between Earthquakes",
+                          titlePanel("Depth of earthquake"),
+                          plotOutput("depth"),
+                          titlePanel("Scatterplot: Depth vs. Magnitude"),
+                          plotOutput("scatterplotDepthMagnitude")
+                 ),
                  tabPanel("World Map",
                           sliderInput("years",
                                       "Year:",
@@ -95,19 +106,14 @@ ui <- navbarPage("Group 14: Earthquakes from 1900 - 2013",
                           fluidRow(
                             leafletOutput("mapplot","100%"),
                           )
-                          )
-
+                  ),
                  tabPanel("Report", tags$iframe(style = "height:600px; width:100%; scrolling=yes", src = "Report.pdf")),
 
                  )
-                 
-
 
 #Server
 server <- function(input, output){
   
-
-
   output$data <- DT::renderDataTable({
     datatable(data, options = list(pageLength = 10)) %>%
       formatStyle('Date', whiteSpace = 'nowrap') %>%
@@ -153,7 +159,24 @@ server <- function(input, output){
          y = "Mean Value") +
       scale_x_continuous(breaks = seq(min(evolutionOfEarthquakes$Year), max(evolutionOfEarthquakes$Year), by = 6))
   })
+  
+  #Create "Bar plot for depth"
+  output$depth <- renderPlot({
+    barplot(meanOfDepths$MeanDepth, 
+            names.arg = meanOfDepths$Year,  
+            xlab = "Year",        
+            ylab = "Mean",        
+            col = "#DC267F",
+            width = 0.01)
+  })
 
+  output$scatterplotDepthMagnitude <- renderPlot({
+    ggplot(data = evolutionOfEarthquakes, aes(x = Mean, y = MeanDepth)) +
+      geom_point() +
+      labs(x = "Mean Magnitude", y = "Mean Depth") +
+      theme(panel.background = element_rect(fill = "white"), 
+            panel.grid.major = element_line(color = "grey")) 
+  })
   
   output$mapplot <- renderLeaflet({
     years <-  input$years 
@@ -164,9 +187,6 @@ server <- function(input, output){
     m <- mapview(quakeYear, xcol = "longitude", ycol = "latitude",crs = 4269, grid = FALSE)
     m@map
   })
-  
-  
-
 }
   
 #Create app
