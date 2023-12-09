@@ -1,12 +1,13 @@
 #install packages
-install.packages("shiny")
-install.packages("DT")
-install.packages("ggplot2")
-install.packages("tidyverse")
-install.packages("sf")
-install.packages("mapview")
-install.packages("leaflet")
-install.packages("lubridate")
+
+#install.packages("shiny")
+#install.packages("DT")
+#install.packages("ggplot2")
+#install.packages("tidyverse")
+#install.packages("sf")
+#install.packages("mapview")
+#install.packages("leaflet")
+#install.packages("lubridate")
 
 #import libraries
 library(shiny)
@@ -122,7 +123,7 @@ ui <- navbarPage("Group 14: Earthquakes from 1900 - 2013",
                  ),
                  tabPanel("Season of Earthquakes",
                           titlePanel("Number of earthquakes each season"),
-                          plotOutput("season")),
+                          plotOutput("season", width = "800px", height = "600px")),
                  tabPanel("Report", tags$iframe(style = "height:600px; width:100%; scrolling=yes", src = "Report.pdf")),
 
                  )
@@ -204,29 +205,33 @@ server <- function(input, output){
     m@map
   })
   
+  #pie_color <- c("#FFB000", "#DC267F", "#785EF0", "#648FFF")
+  
   output$season <- renderPlot({
     # Set the color
-    bar_color <- "#FFB000"
+    pie_color <- c("#FFB000", "#DC267F", "#785EF0", "#648FFF")
     
-    # Create a bar plot with the specified color
-    barplot(season_counts_df$Count, 
-            names.arg = season_counts_df$Season, 
-            col = bar_color, 
-            xlab = "Season", 
-            ylab = "Number of earthquakes")
+    # Calculate percentages
+    percentages <- round((season_counts_df$Count / sum(season_counts_df$Count)) * 100, 1)
     
-    # Define custom labels
-    custom_labels <- c("December \nJanuary \nFebruary", 
-                       "March \nApril \nMay", 
-                       "June \nJuly \nAugust", 
-                       "September \nOctober \nNovember")
+    # Create a pie chart with the specified colors
+    pie(season_counts_df$Count, 
+        labels = paste(season_counts_df$Season, percentages, "%"), 
+        col = pie_color)
     
-    # Add custom labels inside each bar with the same color
-    text(x = barplot(season_counts_df$Count, col = bar_color, add = TRUE), 
-         y = season_counts_df$Count - 0.1 * max(season_counts_df$Count), 
-         label = custom_labels,
-         pos = 1, cex = 0.8, col = "black", font = 2)
+    # Add a legend with months for each season, using Unicode space
+    legend("topright", 
+           legend = paste(season_counts_df$Season, "months:", 
+                          c("Dec, Jan, Feb", "Mar, Apr, May", "Jun, Jul, Aug", "Sep, Oct, Nov")), 
+           fill = pie_color, title = "Season", 
+           text.font = 1)  # Use bold text for separation
   })
+  
+  
+  
+  
+  
+  
 }
   
 #Create app
