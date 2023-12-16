@@ -1,13 +1,12 @@
 #install packages
-
-#install.packages("shiny")
-#install.packages("DT")
-#install.packages("ggplot2")
-#install.packages("tidyverse")
-#install.packages("sf")
-#install.packages("mapview")
-#install.packages("leaflet")
-#install.packages("lubridate")
+install.packages("shiny")
+install.packages("DT")
+install.packages("ggplot2")
+install.packages("tidyverse")
+install.packages("sf")
+install.packages("mapview")
+install.packages("leaflet")
+install.packages("lubridate")
 
 #import libraries
 library(shiny)
@@ -83,6 +82,11 @@ season_counts <- table(seasonOfEarthquakes$season)
 season_counts_df <- data.frame(Season = names(season_counts), Count = as.numeric(season_counts))
 
 
+
+
+
+
+
 #UI
 ui <- navbarPage("Group 14: Earthquakes from 1900 - 2013",
                  tabPanel("Data set",
@@ -98,7 +102,7 @@ ui <- navbarPage("Group 14: Earthquakes from 1900 - 2013",
                           plotOutput("scatterPlot"),
                           titlePanel("Time series plot over the mean of magnitudes"),
                           plotOutput("timeSeriesPlot"),
-                          titlePanel("Histogram over the mean of magnitudes"),
+                          titlePanel("Barchart over the mean of magnitudes"),
                           plotOutput("magnitude")
                  ),
                  tabPanel("World Map",
@@ -145,7 +149,7 @@ server <- function(input, output){
       
   })
   
-  #create "Histogram for magnitude"
+  #create "Barchart for magnitude"
   output$magnitude <- renderPlot({
     barplot(meanOfEarthquakes$Mean, 
             names.arg = meanOfEarthquakes$Year,  
@@ -157,7 +161,7 @@ server <- function(input, output){
     legend("right", legend = c("Mean over 6.5", "Mean under 6.5"), fill = c("#DC267F", "#FFB000"))
   })
   
-  #create histogram for "Number of earthquakes each year" 
+  #create barchart for "Number of earthquakes each year" 
   output$numberOfEarthquakesEachYear <- renderPlot({
     barplot(numberOfEarthquakes$Count, 
             names.arg = numberOfEarthquakes$Year,  
@@ -222,7 +226,7 @@ server <- function(input, output){
     # Add a legend with months for each season, using Unicode space
     legend("topright", 
            legend = paste(season_counts_df$Season, "months:", 
-                          c("Dec, Jan, Feb", "Mar, Apr, May", "Jun, Jul, Aug", "Sep, Oct, Nov")), 
+                          c("Sep, Oct, Nov", "Mar, Apr, May", "Jun, Jul, Aug", "Dec, Jan, Feb")), 
            fill = pie_color, title = "Season", 
            text.font = 1)  # Use bold text for separation
   })
