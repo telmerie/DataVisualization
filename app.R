@@ -104,10 +104,11 @@ ui <- navbarPage("Group 14: Earthquakes from 1900 - 2013",
                           sliderInput("years",
                                       "Year:",
                                       min = 1990, 
-                                      max = 2014,
+                                      max = 2013,
                                       value = 2000,
                                       step = 1,
-                                      animate = TRUE
+                                      width = '100%',
+                                      animate =  animationOptions(interval = 300, loop = TRUE,playButton = icon("play", "fa-2x"), pauseButton = icon("pause", "fa-2x"))
                           ),
                           
                           fluidRow(
@@ -199,8 +200,9 @@ server <- function(input, output){
     
     quakeYear <- dplyr::filter(data, grepl(years , Date))
     
-   
-    m <- mapview(quakeYear, xcol = "longitude", ycol = "latitude",crs = 4269, grid = FALSE)
+    m <- mapview(quakeYear, xcol = "longitude", ycol = "latitude",crs = 4269, grid = FALSE,
+                 leafletOptions = list(dragging = FALSE, zoomControl = FALSE), extent = c(-120, -70, 25, 50), zoom = 5,
+                 animationOptions = list(playInterval = 100))
     m@map
   })
   
