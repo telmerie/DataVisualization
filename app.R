@@ -4,7 +4,6 @@ install.packages("DT")
 install.packages("ggplot2")
 install.packages("tidyverse")
 install.packages("sf")
-install.packages("mapview")
 install.packages("leaflet")
 install.packages("lubridate")
 
@@ -14,7 +13,6 @@ library(DT)
 library(tidyverse)
 library(sf)
 library(ggplot2)
-library(mapview)
 library(leaflet)
 library(lubridate)
 
@@ -106,6 +104,9 @@ ui <- navbarPage("Group 14: Earthquakes from 1900 - 2013",
                           plotOutput("magnitude")
                  ),
                  tabPanel("World Map",
+                          fluidRow(
+                            leafletOutput("mapplot","100%"),
+                          ),
                           sliderInput("years",
                                       "Year:",
                                       min = 1990, 
@@ -113,11 +114,8 @@ ui <- navbarPage("Group 14: Earthquakes from 1900 - 2013",
                                       value = 2000,
                                       step = 1,
                                       width = '100%',
-                                      animate =  animationOptions(interval = 300, loop = TRUE,playButton = icon("play", "fa-2x"), pauseButton = icon("pause", "fa-2x"))
-                          ),
-                          
-                          fluidRow(
-                            leafletOutput("mapplot","100%"),
+                                      sep = "",
+                                      animate =  animationOptions(interval = 300, loop = TRUE,playButton = icon("play", "fa-1,5x"), pauseButton = icon("pause", "fa-1,5x"))
                           )
                  ),
                  tabPanel("Consistency between Earthquakes",
@@ -200,15 +198,24 @@ server <- function(input, output){
             panel.grid.major = element_line(color = "grey")) 
   })
   
+
+  m <- leaflet() %>%
+    addTiles() %>%
+    setView(lng = 0, lat = 0, zoom = 1) %>%
+    setMaxBounds(lng1 = -150, lat1 = -80, lng2 = 150, lat2 = 80)
+  
   output$mapplot <- renderLeaflet({
-    years <-  input$years 
+    m
+  })
+  
+  observeEvent(input$years, {
+    years <- input$years
+    quakeYear <- dplyr::filter(data, grepl(years, Date))
     
-    quakeYear <- dplyr::filter(data, grepl(years , Date))
-    
-    m <- mapview(quakeYear, xcol = "longitude", ycol = "latitude",crs = 4269, grid = FALSE,
-                 leafletOptions = list(dragging = FALSE, zoomControl = FALSE), extent = c(-120, -70, 25, 50), zoom = 5,
-                 animationOptions = list(playInterval = 100))
-    m@map
+    leafletProxy("mapplot") %>%
+      clearMarkers() %>%
+      addCircleMarkers(data = quakeYear, lng = ~longitude, lat = ~latitude,
+                       radius = 3)
   })
   
   #pie_color <- c("#FFB000", "#DC267F", "#785EF0", "#648FFF")
