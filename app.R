@@ -1,25 +1,29 @@
 #install packages
-install.packages("shiny")
-install.packages("DT")
-install.packages("ggplot2")
-install.packages("tidyverse")
-install.packages("sf")
-install.packages("leaflet")
-install.packages("lubridate")
+# install.packages("shiny")
+# install.packages("DT")
+# install.packages("ggplot2")
+# install.packages("tidyverse")
+# install.packages("sf")
+# install.packages("leaflet")
+# install.packages("lubridate")
+
+# library(conflicted)  
 
 #import libraries
-library(shiny)
+# library(shiny)
 library(DT)
 library(tidyverse)
-library(sf)
+# conflict_prefer("filter", "dplyr")
+# conflict_prefer("lag", "dplyr")
+# library(sf)
 library(ggplot2)
 library(leaflet)
 library(lubridate)
 
 
 #import data set
-path <- dirname(rstudioapi::getSourceEditorContext()$path)
-setwd(path)
+# path <- dirname(rstudioapi::getSourceEditorContext()$path)
+# setwd(path)
 data <- read.csv("Earthquakes.csv", header=TRUE, sep=",")
 
 #remove all rows where the year is 2014
